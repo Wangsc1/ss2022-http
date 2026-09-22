@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SS2022 + simple-obfs HTTP 一键管理脚本
-# 基于 mjjtop.com/ss 的 SS2022 + HTTP 模式精简、修正。
+# 仅提供一种模式：Shadowsocks 2022 + simple-obfs HTTP 伪装。
 set -Eeuo pipefail
 umask 077
 
@@ -260,7 +260,7 @@ prompt_value() { local __v=$1 text=$2 def=$3 val; read -r -p "$text [$def]: " va
 install_all() {
   pkg_init; install_deps; install_ss_rust; install_simple_obfs
   if systemctl is-active --quiet "$LEGACY_SS_SERVICE" 2>/dev/null || systemctl is-active --quiet "$LEGACY_OBFS_SERVICE" 2>/dev/null; then
-    warn "检测到原脚本服务，将停用以避免端口或配置冲突"
+    warn "检测到旧版 ss-rust 服务，将停用以避免端口或配置冲突"
     systemctl disable --now "$LEGACY_OBFS_SERVICE" "$LEGACY_SS_SERVICE" 2>/dev/null || true
   fi
   local port backend key host udp_answer udp=1

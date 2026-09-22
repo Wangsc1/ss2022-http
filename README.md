@@ -1,6 +1,6 @@
 # SS2022 + HTTP 一键脚本
 
-从 `mjjtop.com/ss` 的 **SS2022 + HTTP obfs** 模式精简而来，只安装一个节点：
+只安装一个节点，不提供其他模式：
 
 - Shadowsocks 2022：`2022-blake3-aes-128-gcm`
 - TCP：经 `simple-obfs` HTTP 伪装
@@ -67,13 +67,12 @@ ss2022-http uninstall      # 卸载
 
 ## 说明
 
-- 若检测到原脚本创建的 `ss-rust.service` / `ss-rust-obfs.service` 正在运行，安装时会先停用旧服务，以避免端口冲突；不会删除其旧配置。
+- 若检测到早期 `ss-rust.service` / `ss-rust-obfs.service` 正在运行，安装时会先停用旧服务，以避免端口冲突；不会删除其旧配置。
 - 脚本会处理服务器的 UFW 或 firewalld；云厂商安全组仍需自行放行所选端口。
 - `simple-obfs` 只伪装 TCP，UDP 无法经过 HTTP obfs。
 - `simple-obfs` 项目本身使用 GPL-3.0；本仓库不分发其源码或二进制，仅在安装时从官方仓库编译。
 
 ## 致谢
 
-- 原脚本入口：<https://mjjtop.com/ss>
 - shadowsocks-rust：<https://github.com/shadowsocks/shadowsocks-rust>
 - simple-obfs：<https://github.com/shadowsocks/simple-obfs>
