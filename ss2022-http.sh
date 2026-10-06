@@ -255,6 +255,8 @@ show_info() {
   printf '状态: %s\n地址: %s\n端口: %s\n加密: %s\n密码: %s\nHTTP Host: %s\nUDP: %s\n\n' \
     "$state" "$ip" "$PUBLIC_PORT" "$METHOD" "$PASSWORD" "$OBFS_HOST" "$udp_label"
   printf '%bSS 链接：%b\n' "$GREEN" "$NC"; cat "$SUB_DIR/uri.txt"
+  printf '\n%bSurge 节点：%b\n' "$GREEN" "$NC"
+  sed -n '2p' "$SUB_DIR/surge.conf"
   printf '\n文件：%s\n' "$SUB_DIR"
 }
 
@@ -338,7 +340,7 @@ usage() {
   cat <<EOF
 用法: ss2022 [命令]（或 bash $0 [命令]）
   install          安装/重新安装（唯一模式：SS2022 + HTTP obfs）
-  info|show        查看节点与链接
+  info|show        查看节点、SS 链接与 Surge 节点格式
   port [端口]      修改对外端口
   reset [密钥]     重置密钥
   start|stop|restart

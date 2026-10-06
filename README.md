@@ -5,7 +5,7 @@
 - Shadowsocks 2022：`2022-blake3-aes-128-gcm`
 - TCP：经 `simple-obfs` HTTP 伪装
 - UDP：可选，使用相同公网端口直连 Shadowsocks
-- 自动生成 SS URI、Surge 与 Clash 配置
+- 自动生成 SS URI、Surge 与 Clash 配置；安装完成或查看配置时直接输出 Surge 节点行
 - systemd 守护、UFW/firewalld 自动放行
 - 下载 shadowsocks-rust 时校验官方 SHA-256
 - 安装成功后自动保存 `ss2022` 管理命令，卸载时一并删除
@@ -38,7 +38,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2
 安装成功后会自动保存 `/usr/local/sbin/ss2022`，无需另外下载。直接使用：
 
 ```bash
-ss2022 info           # 查看配置和 SS 链接
+ss2022 info           # 查看配置、SS 链接和 Surge 节点行
 ss2022 port 23456     # 修改公网端口
 ss2022 reset          # 生成并启用新密钥
 ss2022 restart        # 重启服务
@@ -46,7 +46,9 @@ ss2022 logs           # 查看最近日志
 ss2022 uninstall      # 卸载（同时删除管理命令）
 ```
 
-旧版已安装但没有管理命令时，只需下载脚本，不必重新安装服务：
+终端输出的 `Surge 节点` 可直接复制到 Surge 配置的 `[Proxy]` 段；完整文件仍保存在 `/etc/ss2022-http/subscribe/surge.conf`。
+
+旧版已安装但没有管理命令，或需要更新管理脚本时，只需下载脚本，不必重新安装服务：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2022-http.sh -o /usr/local/sbin/ss2022
