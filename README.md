@@ -30,7 +30,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2
 bash <(curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2022-http.sh) install
 ```
 
-安装时可设置：公网端口、本地后端端口、SS2022 密钥、HTTP Host 和 UDP 开关；直接回车采用安全随机值/推荐默认值。
+安装时可设置：公网端口、SS2022 密钥、HTTP Host 和 UDP 开关；直接回车采用安全随机值/推荐默认值。本地后端端口在后台自动随机选择 `40000–59999` 范围内的空闲端口（均高于 20000），并避开公网端口，不提供设置选项。
 
 ## 管理命令
 

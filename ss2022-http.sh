@@ -266,8 +266,8 @@ install_all() {
   local port backend key host udp_answer udp=1
   prompt_value port "对外端口" "$(random_port 20000 39999)"
   valid_port "$port" || die "无效对外端口：$port"
+  # 后端本地端口后台随机分配，不提供交互设置。
   while :; do backend=$(random_port 40000 59999); [[ $backend != "$port" ]] && break; done
-  prompt_value backend "后端本地端口" "$backend"
   if ! valid_port "$backend" || [[ $backend == "$port" ]]; then
     die "后端端口无效或与对外端口相同"
   fi
