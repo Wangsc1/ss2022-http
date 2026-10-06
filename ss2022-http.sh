@@ -11,6 +11,8 @@ readonly ENV_FILE="${CONF_DIR}/server.env"
 readonly SUB_DIR="${CONF_DIR}/subscribe"
 readonly SS_BIN="/usr/local/bin/ssserver"
 readonly OBFS_BIN="/usr/local/bin/obfs-server"
+readonly MANAGER_BIN="/usr/local/sbin/ss2022"
+readonly SCRIPT_URL="https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2022-http.sh"
 readonly SS_SERVICE="ss2022-http.service"
 readonly OBFS_SERVICE="ss2022-http-obfs.service"
 readonly LEGACY_SS_SERVICE="ss-rust.service"
@@ -115,7 +117,7 @@ install_simple_obfs() {
 
 quote_env() { printf '%q' "$1"; }
 load_env() {
-  [[ -r "$ENV_FILE" ]] || die "尚未安装，请先运行：bash $0 install"
+  [[ -r "$ENV_FILE" ]] || die "尚未安装，请先运行：ss2022 install（或 bash $0 install）"
   # shellcheck disable=SC1090
   source "$ENV_FILE"
 }
@@ -256,6 +258,29 @@ show_info() {
   printf '\n文件：%s\n' "$SUB_DIR"
 }
 
+install_manager_command() {
+  local source=${BASH_SOURCE[0]} tmp
+  mkdir -p "$(dirname "$MANAGER_BIN")"
+  tmp=$(mktemp "${MANAGER_BIN}.XXXXXX") || die "无法创建管理命令临时文件"
+  if [[ -f "$source" && -r "$source" ]]; then
+    if ! cp -- "$source" "$tmp"; then
+      rm -f -- "$tmp"; die "复制管理脚本失败"
+    fi
+  else
+    # bash <(curl ...) 的输入是管道，重新获取脚本后保存为持久命令。
+    if ! curl -fsSL --retry 3 --connect-timeout 10 --max-time 60 "$SCRIPT_URL" -o "$tmp"; then
+      rm -f -- "$tmp"; die "下载管理脚本失败"
+    fi
+  fi
+  if [[ ! -s "$tmp" ]] || ! bash -n "$tmp"; then
+    rm -f -- "$tmp"; die "管理脚本为空或语法检查失败"
+  fi
+  if ! chmod 0755 "$tmp" || ! mv -f -- "$tmp" "$MANAGER_BIN"; then
+    rm -f -- "$tmp"; die "保存管理命令失败"
+  fi
+  info "管理命令已保存：ss2022（${MANAGER_BIN}）"
+}
+
 prompt_value() { local __v=$1 text=$2 def=$3 val; read -r -p "$text [$def]: " val; printf -v "$__v" '%s' "${val:-$def}"; }
 install_all() {
   pkg_init; install_deps; install_ss_rust; install_simple_obfs
@@ -282,7 +307,7 @@ install_all() {
   sleep 1
   systemctl is-active --quiet "$SS_SERVICE" || { journalctl -u "$SS_SERVICE" -n 20 --no-pager; die "SS 服务启动失败"; }
   systemctl is-active --quiet "$OBFS_SERVICE" || { journalctl -u "$OBFS_SERVICE" -n 20 --no-pager; die "obfs 服务启动失败"; }
-  open_firewall; show_info
+  open_firewall; install_manager_command; show_info
 }
 
 reset_key() {
@@ -304,14 +329,14 @@ uninstall_all() {
   local answer=${1:-}
   [[ $answer == --yes ]] || { read -r -p "确认卸载 SS2022 + HTTP？输入 yes: " answer; [[ $answer == yes ]] || exit 0; }
   systemctl disable --now "$OBFS_SERVICE" "$SS_SERVICE" 2>/dev/null || true
-  rm -f "/etc/systemd/system/$OBFS_SERVICE" "/etc/systemd/system/$SS_SERVICE" "$SS_BIN" "$OBFS_BIN" /usr/local/bin/obfs-local
+  rm -f "/etc/systemd/system/$OBFS_SERVICE" "/etc/systemd/system/$SS_SERVICE" "$SS_BIN" "$OBFS_BIN" /usr/local/bin/obfs-local "$MANAGER_BIN"
   rm -rf "$CONF_DIR"; systemctl daemon-reload
   info "已卸载（编译依赖未自动删除）"
 }
 
 usage() {
   cat <<EOF
-用法: bash $0 [命令]
+用法: ss2022 [命令]（或 bash $0 [命令]）
   install          安装/重新安装（唯一模式：SS2022 + HTTP obfs）
   info|show        查看节点与链接
   port [端口]      修改对外端口

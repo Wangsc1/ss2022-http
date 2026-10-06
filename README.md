@@ -8,6 +8,7 @@
 - 自动生成 SS URI、Surge 与 Clash 配置
 - systemd 守护、UFW/firewalld 自动放行
 - 下载 shadowsocks-rust 时校验官方 SHA-256
+- 安装成功后自动保存 `ss2022` 管理命令，卸载时一并删除
 
 ## 支持环境
 
@@ -34,23 +35,25 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2
 
 ## 管理命令
 
-先下载到本机：
+安装成功后会自动保存 `/usr/local/sbin/ss2022`，无需另外下载。直接使用：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2022-http.sh -o /usr/local/sbin/ss2022-http
-chmod +x /usr/local/sbin/ss2022-http
+ss2022 info           # 查看配置和 SS 链接
+ss2022 port 23456     # 修改公网端口
+ss2022 reset          # 生成并启用新密钥
+ss2022 restart        # 重启服务
+ss2022 logs           # 查看最近日志
+ss2022 uninstall      # 卸载（同时删除管理命令）
 ```
 
-然后使用：
+旧版已安装但没有管理命令时，只需下载脚本，不必重新安装服务：
 
 ```bash
-ss2022-http info           # 查看配置和 SS 链接
-ss2022-http port 23456     # 修改公网端口
-ss2022-http reset          # 生成并启用新密钥
-ss2022-http restart        # 重启服务
-ss2022-http logs           # 查看最近日志
-ss2022-http uninstall      # 卸载
+curl -fsSL https://raw.githubusercontent.com/Wangsc1/ss2022-http/main/ss2022-http.sh -o /usr/local/sbin/ss2022
+chmod +x /usr/local/sbin/ss2022
 ```
+
+如果当前 shell 的 PATH 不包含 `/usr/local/sbin`，可直接使用 `/usr/local/sbin/ss2022`。
 
 配置与订阅位于：
 
